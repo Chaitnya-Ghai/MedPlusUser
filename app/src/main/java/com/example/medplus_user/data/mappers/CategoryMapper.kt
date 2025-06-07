@@ -17,16 +17,11 @@ fun CategoryDto.toDomain(): Category {
 
 // DTO -> Entity
 fun CategoryDto.toEntity(): CategoryEntity? {
-    val safeId = id
-    return if (!safeId.isNullOrBlank()) {
-        CategoryEntity(
-            id = safeId,
-            categoryName = categoryName,
-            imageUrl = imageUrl
-        )
-    } else {
-        null
-    }
+    return CategoryEntity(
+        id = id,
+        categoryName = categoryName,
+        imageUrl = imageUrl
+    )
 }
 
 
@@ -43,7 +38,7 @@ fun CategoryEntity.toDomain(): Category {
 // Domain -> Entity (optional, useful for inserting Domain into Room)
 fun Category.toEntity(): CategoryEntity {
     return CategoryEntity(
-        id = id ?: "",  // Ensure non-null value for id
+        id = id ,  // Ensure non-null value for id
         categoryName = categoryName,
         imageUrl = imageUrl  // Include imageUrl here
     )

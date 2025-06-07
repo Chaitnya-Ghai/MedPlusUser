@@ -26,6 +26,7 @@ class UserRepositoryImpl @Inject constructor(
         if (networkChecker.isNetworkAvailable()) {
             try {
                 val dtoList = firebaseService.getCategories()
+                Log.d("UserRepository", "Mapped categories: $dtoList")
                 val categories = dtoList.map { it.toDomain() }
                 Log.d("UserRepository", "Mapped categories: $categories")
 
@@ -50,10 +51,10 @@ class UserRepositoryImpl @Inject constructor(
             emit(data)  // Emit local categories if no network available
         }
     }
-    
+
     override suspend fun getMedicinesByCategory(categoryId: String): List<Medicines> {
         return if (networkChecker.isNetworkAvailable()) {
-//            val dtoList = firebaseService.getCategories()
+            val dtoList = firebaseService.getCategories()
 //            val categories = dtoList.map { it.toDomain() }
             // Optionally save to Room here
 //             categoryDao.insertCategories(categories)

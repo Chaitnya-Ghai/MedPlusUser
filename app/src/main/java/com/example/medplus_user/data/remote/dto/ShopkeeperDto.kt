@@ -6,6 +6,8 @@ data class ShopkeeperDto(
     val ownerName: String = "",
     val phoneNumber: String = "",
     val address: String = "",
+    val latitude: Double = 0.0,
+    val longitude: Double = 0.0,
     val inventory: List<InventoryDto> = emptyList(),
     val medicineId: List<String> = emptyList(),//for faster query
     val licenseImageUrl: String = "",

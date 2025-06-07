@@ -6,9 +6,13 @@ import com.example.medplus_user.common.NetworkChecker
 import com.example.medplus_user.data.local.dao.CategoryDao
 import com.example.medplus_user.data.local.dao.MedicinesDao
 import com.example.medplus_user.data.local.localDatabase.AppDatabase
+import com.example.medplus_user.data.location.AddressResolver
+import com.example.medplus_user.data.location.LocationProviderImpl
 import com.example.medplus_user.data.remote.FirebaseService
+import com.example.medplus_user.data.repository.LocationProvider
 import com.example.medplus_user.data.repository.UserRepositoryImpl
 import com.example.medplus_user.domain.repository.UserRepository
+import com.example.medplus_user.domain.useCases.GetCategoriesUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -20,7 +24,7 @@ import javax.inject.Singleton
 @InstallIn(SingletonComponent::class)
 object AppModule {
 
-
+    //Room DB & DAOs
     @Provides
     @Singleton
     fun provideDatabase(@ApplicationContext context: Context): AppDatabase {
@@ -33,15 +37,24 @@ object AppModule {
             .build()
     }
     @Provides
-    fun provideCategoryDao(db: AppDatabase): CategoryDao {
-        return db.CategoryDao()
-    }
-
+    fun provideCategoryDao(db: AppDatabase): CategoryDao = db.CategoryDao()
     @Provides
-    fun provideMedicinesDao(db: AppDatabase): MedicinesDao {
-        return db.MedicinesDao()
+    fun provideMedicinesDao(db: AppDatabase): MedicinesDao = db.MedicinesDao()
+    // NetworkChecker
+    @Provides
+    @Singleton
+    fun provideNetworkChecker(@ApplicationContext context: Context): NetworkChecker {
+        return NetworkChecker(context)
     }
 
+    //FirebaseService
+    @Provides
+    @Singleton
+    fun provideFirebaseService(): FirebaseService {
+        return FirebaseService() // Assuming it's not already injected
+    }
+
+    // 🔹 Repository
     @Provides
     @Singleton
     fun provideUserRepository(
@@ -50,13 +63,26 @@ object AppModule {
         categoryDao: CategoryDao,
         medicinesDao: MedicinesDao
     ): UserRepository {
-        return UserRepositoryImpl(networkChecker, firebaseService , categoryDao , medicinesDao )
+        return UserRepositoryImpl(networkChecker, firebaseService, categoryDao, medicinesDao)
     }
 
+    //UseCase
+    @Provides
+    @Singleton
+    fun provideGetCategoriesUseCase(repository: UserRepository): GetCategoriesUseCase {
+        return GetCategoriesUseCase(repository)
+    }
+
+    //  Location Provider
+    @Provides
+    @Singleton
+    fun provideLocationProvider(@ApplicationContext context: Context): LocationProvider {
+        return LocationProviderImpl(context)
+    }
 
     @Provides
     @Singleton
-    fun provideNetworkChecker(@ApplicationContext context: Context): NetworkChecker {
-        return NetworkChecker(context)
+    fun provideAddressResolver(@ApplicationContext context: Context): AddressResolver {
+        return AddressResolver(context)
     }
 }

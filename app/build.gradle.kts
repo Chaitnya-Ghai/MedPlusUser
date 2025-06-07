@@ -80,13 +80,13 @@ dependencies {
     implementation("androidx.room:room-runtime:2.7.1")
     implementation("androidx.room:room-ktx:2.7.1")
     kapt("androidx.room:room-compiler:2.7.1")
-
 // live data
     implementation("androidx.compose.runtime:runtime-livedata:1.8.1")
     // ✅ Coil (Image loading in Jetpack Compose)
     implementation("io.coil-kt:coil-compose:2.5.0")
 //    gson
-    implementation("com.google.code.gson:gson:2.11.0")
-
-
+    implementation(libs.gson)
+// location
+    implementation(libs.play.services.location)
+    implementation(libs.play.services.maps)//map dependency
 }
