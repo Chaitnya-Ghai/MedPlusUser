@@ -13,6 +13,9 @@ import com.example.medplus_user.data.repository.LocationProvider
 import com.example.medplus_user.data.repository.UserRepositoryImpl
 import com.example.medplus_user.domain.repository.UserRepository
 import com.example.medplus_user.domain.useCases.GetCategoriesUseCase
+import com.example.medplus_user.domain.useCases.GetMedicineByNameUseCase
+import com.example.medplus_user.domain.useCases.GetMedicinesByCategoryUseCase
+import com.example.medplus_user.domain.useCases.GetaMedicineByIdUseCase
 import dagger.Module
 import dagger.Provides
 import dagger.hilt.InstallIn
@@ -51,7 +54,7 @@ object AppModule {
     @Provides
     @Singleton
     fun provideFirebaseService(): FirebaseService {
-        return FirebaseService() // Assuming it's not already injected
+        return FirebaseService()
     }
 
     // 🔹 Repository
@@ -73,7 +76,26 @@ object AppModule {
         return GetCategoriesUseCase(repository)
     }
 
-    //  Location Provider
+    @Provides
+    @Singleton
+    fun provideGetMedicinesByCategoryUseCase(repository: UserRepository): GetMedicinesByCategoryUseCase {
+        return GetMedicinesByCategoryUseCase(repository)
+    }
+
+    @Provides
+    @Singleton
+    fun provideGetaMedicineByIdUseCase(repository: UserRepository): GetaMedicineByIdUseCase {
+        return GetaMedicineByIdUseCase(repository)
+    }
+
+
+    @Provides
+    @Singleton
+    fun provideGetMedicinesByNameUseCase(repository: UserRepository): GetMedicineByNameUseCase {
+        return GetMedicineByNameUseCase(repository)
+    }
+
+    // Location Services
     @Provides
     @Singleton
     fun provideLocationProvider(@ApplicationContext context: Context): LocationProvider {

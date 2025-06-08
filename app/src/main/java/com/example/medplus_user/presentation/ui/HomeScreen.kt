@@ -75,6 +75,7 @@ import androidx.compose.ui.unit.sp
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavController
 import coil.compose.rememberAsyncImagePainter
+import com.example.medplus_user.presentation.CategoryScreen
 import com.example.medplus_user.presentation.SearchScreen
 import com.example.medplus_user.ui.theme.MedPlusUserTheme
 import com.example.medplus_user.presentation.viewModel.MainViewModel
@@ -141,7 +142,7 @@ fun HomeView(
             item { Spacer(modifier = Modifier.height(20.dp)) }
             item { RandomShops()} // auto-scroll slider
             item { Spacer(modifier = Modifier.height(20.dp)) }
-            item { CategoriesSection(viewModel) }
+            item { CategoriesSection(viewModel,navController) }
             item { Spacer(modifier = Modifier.height(40.dp)) }
         }
     }
@@ -255,7 +256,7 @@ fun SearchBar(moveUp: Boolean, onSearchBarClick: () -> Unit) {
 }
 
 @Composable
-fun CategoriesSection(viewModel: MainViewModel) {
+fun CategoriesSection(viewModel: MainViewModel , navController: NavController) {
     Text(text = "Categories", modifier = Modifier.padding(12.dp), fontSize = 24.sp)
     val categories by viewModel.categories.collectAsState(emptyList())
     LazyVerticalGrid(
@@ -268,14 +269,17 @@ fun CategoriesSection(viewModel: MainViewModel) {
     ) {
         items(categories) { item ->
             Column (
-                modifier = Modifier.padding(8.dp).fillMaxSize() ,
+                modifier = Modifier.padding(8.dp).fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ){
                 Card(
                     modifier = Modifier
                         .fillMaxSize()
                         .aspectRatio(1f)
-                        .clickable { Log.e("Ui Event", "${item.categoryName} clicked") },
+                        .clickable {
+                            Log.e("Ui Event", "${item.categoryName} clicked")
+                                   navController.navigate(CategoryScreen(item.id.toString() , item.categoryName.toString()))
+                                   },
                     shape = RoundedCornerShape(8.dp),
                     elevation = CardDefaults.elevatedCardElevation(8.dp)
                 ) {

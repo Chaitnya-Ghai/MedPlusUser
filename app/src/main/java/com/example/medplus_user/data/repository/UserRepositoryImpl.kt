@@ -34,7 +34,7 @@ class UserRepositoryImpl @Inject constructor(
                 Log.d("UserRepository", "local save categories: $entityList")
 
                 val validCategories = entityList.filter {
-                    it?.imageUrl?.isNotBlank() ==true
+                    it.imageUrl.isNotBlank() ==true
                 }
                 categoryDao.insertCategories(validCategories)
 
@@ -47,43 +47,31 @@ class UserRepositoryImpl @Inject constructor(
             val localEntities = categoryDao.showCategories()
             val data = localEntities.map { it.toDomain() }
             Log.d("UserRepository", "Mapped local data categories: $data")
-
             emit(data)  // Emit local categories if no network available
         }
     }
-
     override suspend fun getMedicinesByCategory(categoryId: String): List<Medicines> {
-        return if (networkChecker.isNetworkAvailable()) {
-            val dtoList = firebaseService.getCategories()
-//            val categories = dtoList.map { it.toDomain() }
-            // Optionally save to Room here
-//             categoryDao.insertCategories(categories)
-            emptyList()
-        } else {
-            // If offline, fetch from Room DB
-            // categoryDao.getAllCategories()
-            emptyList() // Temporary fallback
-        }
+        val list = firebaseService.getMedicinesBy(categoryId = categoryId)
+        return list.map { it.toDomain() }
     }
-
-
-    override suspend fun getMedicines(): Flow<List<Medicines>> = flow{
-
+    override suspend fun getMedicinesByName(name: String): List<Medicines> {
+        val list = firebaseService.getMedicinesBy(name = name)
+        return list.map { it.toDomain() }
     }
-
+    override suspend fun getMedicine(medId: String): List<Medicines> {
+        val list = firebaseService.getMedicinesBy(medicineId = medId)
+        return list.map { it.toDomain() }
+    }
     override suspend fun getOrders(): Flow<List<Orders>> = flow {
 
     }
-
     override suspend fun placeOrder(order: Orders): Flow<Boolean> = flow {
 
     }
-
     override suspend fun getShopkeepers(): Flow<List<Shopkeeper>> = flow {
 
     }
 }
-
 //UserRepositoryImpl =
 // Manages fetching from both local and remote data sources.
 // if (networkChecker.isNetworkAvailable()) firebase else local

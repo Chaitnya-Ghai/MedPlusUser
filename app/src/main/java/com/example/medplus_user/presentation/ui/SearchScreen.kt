@@ -29,7 +29,6 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.livedata.observeAsState
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
@@ -37,16 +36,15 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.text.font.FontFamily
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
-import com.example.medplus_user.R
 import com.example.medplus_user.domain.models.Category
 import com.example.medplus_user.presentation.CategoryScreen
 import com.example.medplus_user.presentation.viewModel.MainViewModel
@@ -56,7 +54,7 @@ fun SearchView(viewModel: MainViewModel, navController: NavHostController){
     val categories by viewModel.categories.collectAsState(emptyList())
     Column(modifier = Modifier.fillMaxSize()) {
         SearchBar(categories, navController)
-        MainBody(categories)
+        MainBody(categories=categories,navController = navController)
     }
 }
 
@@ -69,18 +67,19 @@ fun SearchBar(categories: List<Category>, navController: NavHostController) {
 
     Column(
         modifier = Modifier.fillMaxWidth(),
-        horizontalAlignment = Alignment.CenterHorizontally // 👈 This centers children horizontally
+        horizontalAlignment = Alignment.CenterHorizontally //This centers children horizontally
     ) {
         SearchBar(
-            modifier = Modifier.fillMaxWidth(0.95f), // 👈 Slight margin from edges if desired
+            modifier = Modifier.fillMaxWidth(0.95f), // Slight margin from edges if desired
             inputField = {
                 InputField(
                     query = query,
                     onQueryChange = { query = it },
                     onSearch = {},
                     expanded = expanded,
+//                    Lambda to handle changes in the dropdown's expanded state.
                     onExpandedChange = { expanded = it },
-                    placeholder = { Text("Search..") }
+                    placeholder = { Text("Search...") }
                 )
             },
             expanded = expanded,
@@ -97,9 +96,6 @@ fun SearchBar(categories: List<Category>, navController: NavHostController) {
                             .padding(8.dp)
                             .height(60.dp)
                             .width(100.dp)
-                            .clickable {
-                                navController.navigate(CategoryScreen(item.categoryName.toString()))
-                            }
                             .background(Color.LightGray, shape = RoundedCornerShape(8.dp)),
                         horizontalAlignment = Alignment.CenterHorizontally,
                         verticalArrangement = Arrangement.Center
@@ -116,7 +112,7 @@ fun SearchBar(categories: List<Category>, navController: NavHostController) {
 }
 
 @Composable
-fun MainBody(categories: List<Category>){
+fun MainBody(categories: List<Category> , navController: NavController){
     LazyVerticalGrid(
         columns = GridCells.Fixed(2),
         modifier = Modifier
@@ -129,37 +125,46 @@ fun MainBody(categories: List<Category>){
                 modifier = Modifier.padding(8.dp).fillMaxSize(),
                 horizontalAlignment = Alignment.CenterHorizontally
             ) {
-                Card(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .aspectRatio(1f)
-                        .clickable { Log.e("Ui Event", "${item.categoryName} clicked") },
-                    shape = RoundedCornerShape(8.dp),
-                    elevation = CardDefaults.elevatedCardElevation(8.dp)
-                ) {
-                    Image(
-                        painter = rememberAsyncImagePainter(model = item.imageUrl),
-                        contentDescription = "Image of ${item.categoryName}",
-                        modifier = Modifier.fillMaxSize(),
-                        contentScale = ContentScale.Crop
-                    )
-                    Text(
-                        text = item.categoryName.toString(),
-                        modifier = Modifier
-                            .padding(8.dp)
-                            .fillMaxWidth(),
-
-                        style = TextStyle(
-                            fontFamily = FontFamily.Monospace,
-                            fontWeight = FontWeight.Bold,
-                            fontSize = 12.sp,
-                            textAlign = TextAlign.Center
-                        )
-                    )
-                }
+                CategoryCardView(item , navController = navController)
             }
         }
     }
+}
+
+
+
+
+@Composable
+fun CategoryCardView(item: Category , navController: NavController) = Card(
+    modifier = Modifier
+        .fillMaxSize()
+        .aspectRatio(1f)
+        .clickable {
+            Log.e("Ui Event", "${item.categoryName} clicked")
+            navController.navigate( CategoryScreen( item.id.toString() , item.categoryName) )
+                   },
+    shape = RoundedCornerShape(8.dp),
+    elevation = CardDefaults.elevatedCardElevation(8.dp)
+) {
+    Image(
+        painter = rememberAsyncImagePainter(model = item.imageUrl),
+        contentDescription = "Image of ${item.categoryName}",
+        modifier = Modifier.fillMaxSize(),
+        contentScale = ContentScale.Crop
+    )
+    Text(
+        text = item.categoryName.toString(),
+        modifier = Modifier
+            .padding(8.dp)
+            .fillMaxWidth(),
+
+        style = TextStyle(
+            fontFamily = FontFamily.Monospace,
+            fontWeight = FontWeight.Bold,
+            fontSize = 12.sp,
+            textAlign = TextAlign.Center
+        )
+    )
 }
 // UI is not finalized yet,
 // so dummy data and dummy UI are being used for now.

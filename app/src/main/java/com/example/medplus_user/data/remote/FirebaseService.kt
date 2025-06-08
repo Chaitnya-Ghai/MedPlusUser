@@ -7,7 +7,6 @@ import com.example.medplus_user.common.Constants.Companion.pharmacist
 import com.example.medplus_user.data.remote.dto.CategoryDto
 import com.example.medplus_user.data.remote.dto.MedicineDto
 import com.example.medplus_user.data.remote.dto.ShopkeeperDto
-import com.example.medplus_user.domain.models.Shopkeeper
 import com.google.firebase.Firebase
 import com.google.firebase.firestore.firestore
 import kotlinx.coroutines.tasks.await
@@ -33,6 +32,35 @@ class FirebaseService @Inject constructor(){
             emptyList()
         }
     }
+
+    suspend fun getMedicinesBy(
+        medicineId: String? = null,
+        categoryId: String? = null,
+        name: String? = null
+    ): List<MedicineDto> {
+        return try {
+            val query = when {
+                medicineId != null -> db.collection("medicines")
+                    .whereEqualTo("id", medicineId)
+
+                categoryId != null -> db.collection("medicines")
+                    .whereArrayContains("belongingCategory", categoryId)
+
+                name != null -> db.collection("medicines")
+                    .whereEqualTo("medicineName", name)
+
+                else -> db.collection("medicines")
+            }
+            val snapshot = query.get().await()
+            snapshot.documents.mapNotNull {
+                it.toObject(MedicineDto::class.java)
+            }
+        } catch (e: Exception) {
+            Log.e("FirebaseService", "getMedicinesBy error = ${e.message}")
+            emptyList()
+        }
+    }
+
 
     suspend fun getPharmacist(): List<ShopkeeperDto>{
         return try {
