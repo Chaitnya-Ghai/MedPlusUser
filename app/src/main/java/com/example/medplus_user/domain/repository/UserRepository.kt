@@ -24,5 +24,4 @@ interface UserRepository {
 
     // Fetches the list of shopkeepers from remote or local sources
     suspend fun getShopkeepers(): Flow<List<Shopkeeper>>
-
 }
