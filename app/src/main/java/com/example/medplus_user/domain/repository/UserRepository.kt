@@ -17,5 +17,5 @@ interface UserRepository {
     suspend fun getOrders(): Flow<List<Orders>>
     suspend fun placeOrder(order: Orders): Flow<Boolean>
     // Fetches the list of shopkeepers from remote or local sources
-    suspend fun getShopkeepers(): Flow<List<Shopkeeper>>
+    fun getShopkeepers(medicineId: String): Flow<List<Shopkeeper>>
 }

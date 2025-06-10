@@ -8,10 +8,12 @@ import com.example.medplus_user.data.location.AddressResolver
 import com.example.medplus_user.data.repository.LocationProvider
 import com.example.medplus_user.domain.models.Category
 import com.example.medplus_user.domain.models.Medicines
+import com.example.medplus_user.domain.models.Shopkeeper
 import com.example.medplus_user.domain.useCases.GetCategoriesUseCase
 import com.example.medplus_user.domain.useCases.GetMedicineByNameUseCase
 import com.example.medplus_user.domain.useCases.GetMedicinesByCategoryUseCase
 import com.example.medplus_user.domain.useCases.GetaMedicineByIdUseCase
+import com.example.medplus_user.domain.useCases.ShopkeeperUseCases
 import dagger.hilt.android.lifecycle.HiltViewModel
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -29,7 +31,8 @@ class MainViewModel @Inject constructor(
     private val getMedicinesUseCase: GetCategoriesUseCase,
     private val getMedicinesByCategoryUseCase: GetMedicinesByCategoryUseCase,
     private val getMedicinesByNameUseCase: GetMedicineByNameUseCase,
-    private val getMedicinesByIdUseCase: GetaMedicineByIdUseCase
+    private val getMedicinesByIdUseCase: GetaMedicineByIdUseCase,
+    private val shopkeeperUseCases: ShopkeeperUseCases
 ) : ViewModel() {
     val categories :StateFlow<List<Category>> = getMedicinesUseCase
         .invoke()
@@ -66,7 +69,16 @@ class MainViewModel @Inject constructor(
         }
     }
 
+    private val _shopkeepers = MutableStateFlow<List<Shopkeeper>>(emptyList())
+    val shopkeepers: StateFlow<List<Shopkeeper>> = _shopkeepers.asStateFlow()
 
+    fun fetchShopkeepers(medicineId: String) {
+        viewModelScope.launch {
+            shopkeeperUseCases(medicineId).collect { list ->
+                _shopkeepers.value = list
+            }
+        }
+    }
     fun getMedicinesByName(name: String) {
         viewModelScope.launch(Dispatchers.IO) {
             getMedicinesByNameUseCase(name=name)

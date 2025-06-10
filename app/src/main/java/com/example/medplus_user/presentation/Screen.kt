@@ -14,6 +14,12 @@ data class CategoryScreen(
     val name : String
 )
 @Serializable
-data class ResultScreen(
+data class ShopkeeperResultScreen(
     val id : String
+)
+
+@Serializable
+data class MedicineScreen(
+    val id : String,
+    val shopMedicinePrice : String,
 )

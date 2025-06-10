@@ -62,9 +62,10 @@ class FirebaseService @Inject constructor(){
     }
 
 
-    suspend fun getPharmacist(): List<ShopkeeperDto>{
+    suspend fun getPharmacist(medicineId: String): List<ShopkeeperDto>{
         return try {
-            val snapshot = db.collection(pharmacist).get().await()
+            val snapshot = db.collection(pharmacist).whereArrayContains("medicineId",medicineId)
+                .get().await()
             snapshot.documents.mapNotNull { it.toObject(ShopkeeperDto::class.java) }
         }catch (e: Exception){
             Log.e("FirebaseService", "getPharmacist error = ${e.message}")

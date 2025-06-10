@@ -14,6 +14,7 @@ import com.example.medplus_user.domain.models.Shopkeeper
 import com.example.medplus_user.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
+import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -68,8 +69,9 @@ class UserRepositoryImpl @Inject constructor(
     override suspend fun placeOrder(order: Orders): Flow<Boolean> = flow {
 
     }
-    override suspend fun getShopkeepers(): Flow<List<Shopkeeper>> = flow {
-
+    override fun getShopkeepers(medicineId: String): Flow<List<Shopkeeper>> = flow {
+        val list = firebaseService.getPharmacist(medicineId = medicineId)
+        emit(list.map { it.toDomain() })
     }
 }
 //UserRepositoryImpl =

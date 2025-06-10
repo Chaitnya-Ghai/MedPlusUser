@@ -53,7 +53,7 @@ import com.example.medplus_user.presentation.viewModel.MainViewModel
 fun SearchView(viewModel: MainViewModel, navController: NavHostController){
     val categories by viewModel.categories.collectAsState(emptyList())
     Column(modifier = Modifier.fillMaxSize()) {
-        SearchBar(categories, navController)
+        SearchField(categories, navController)
         MainBody(categories=categories,navController = navController)
     }
 }
@@ -61,7 +61,7 @@ fun SearchView(viewModel: MainViewModel, navController: NavHostController){
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun SearchBar(categories: List<Category>, navController: NavHostController) {
+fun SearchField(categories: List<Category>, navController: NavHostController) {
     var query by remember { mutableStateOf("") }
     var expanded by remember { mutableStateOf(false) }
 

@@ -1,12 +1,10 @@
 package com.example.medplus_user.presentation.ui
 
 import android.util.Log
-import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxHeight
@@ -18,7 +16,6 @@ import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material.icons.filled.Search
@@ -51,12 +48,12 @@ import androidx.navigation.NavController
 import androidx.navigation.NavHostController
 import coil.compose.rememberAsyncImagePainter
 import com.example.medplus_user.domain.models.Medicines
-import com.example.medplus_user.presentation.ResultScreen
+import com.example.medplus_user.presentation.ShopkeeperResultScreen
 import com.example.medplus_user.presentation.viewModel.MainViewModel
 
 @Composable
 fun CategoryView(
-    arg: String?, name: String,
+    medId: String?, name: String,
     navController: NavHostController,
     viewModel: MainViewModel
 ) {
@@ -64,8 +61,8 @@ fun CategoryView(
     val query = remember { mutableStateOf("") }
 
     LaunchedEffect(Unit) {
-        Log.e("CategoryScreen", "CategoryView: $arg " )
-        viewModel.getMedicinesByCategory(catId = arg.toString())
+        Log.e("CategoryScreen", "CategoryView: $medId " )
+        viewModel.getMedicinesByCategory(catId = medId.toString())
     }
 
     val medicineList by viewModel.medicinesByCat.collectAsState()
@@ -74,7 +71,7 @@ fun CategoryView(
         Spacer(modifier = Modifier.padding(top = 26.dp))
         Text(text = name, modifier = Modifier.padding(12.dp), fontSize = 24.sp)
         Spacer(modifier = Modifier.padding(12.dp))
-        SearchBar(query)
+        SearchField(query)
         LazyVerticalGrid(
             columns = GridCells.Fixed(2),
             modifier = Modifier
@@ -105,33 +102,35 @@ fun MedicineCard(item: Medicines , navController: NavController) = Card(
         .aspectRatio(1f)
         .clickable {
             Log.e("Ui Event", "${item.medicineName} clicked")
-            navController.navigate( ResultScreen(item.medicineName.toString()))//this screen contains medicines from local shopkeepers
-                   },
+            navController.navigate(ShopkeeperResultScreen(item.id.toString()))//this screen contains medicines from local shopkeepers
+        },
     shape = RoundedCornerShape(8.dp),
     elevation = CardDefaults.elevatedCardElevation(8.dp)
 ) {
-    Image(
-        painter = rememberAsyncImagePainter(model = item.medicineImg),
-        contentDescription = "Image of ${item.medicineName}",
-        modifier = Modifier.fillMaxSize(),
-        contentScale = ContentScale.Crop
-    )
-    Text(
-        text = item.medicineName.toString(),
-        modifier = Modifier
-            .padding(8.dp)
-            .fillMaxWidth(),
-        style = TextStyle(
-            fontFamily = FontFamily.Monospace,
-            fontWeight = FontWeight.Bold,
-            fontSize = 12.sp,
-            textAlign = TextAlign.Center
+    Column {
+        Image(
+            painter = rememberAsyncImagePainter(model = item.medicineImg),
+            contentDescription = "Image of ${item.medicineName}",
+            modifier = Modifier.fillMaxSize(),
+            contentScale = ContentScale.Crop
         )
-    )
+        Text(
+            text = item.medicineName.toString(),
+            modifier = Modifier
+                .padding(8.dp)
+                .fillMaxWidth(),
+            style = TextStyle(
+                fontFamily = FontFamily.Monospace,
+                fontWeight = FontWeight.Bold,
+                fontSize = 12.sp,
+                textAlign = TextAlign.Center
+            )
+        )
+    }
 }
 
 @Composable
-fun SearchBar(query: MutableState<String>) {
+fun SearchField(query: MutableState<String>) {
     OutlinedTextField(
         value = query.value,
         onValueChange = { query.value = it },
@@ -181,7 +180,7 @@ fun SearchBarPreview() {
             horizontalAlignment = Alignment.CenterHorizontally,
             verticalArrangement = Arrangement.Center
         ) {
-            SearchBar(query = query)
+            SearchField(query = query)
         }
     }
 }

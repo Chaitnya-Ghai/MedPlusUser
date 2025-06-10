@@ -138,7 +138,7 @@ fun HomeView(
         ) {
             item { HeaderSection(navController) }
             item { LocationSection(viewModel) }
-            item { SearchBar(moveUp, { moveUp = true }) }
+            item { SearchField(moveUp, { moveUp = true }) }
             item { Spacer(modifier = Modifier.height(20.dp)) }
             item { RandomShops()} // auto-scroll slider
             item { Spacer(modifier = Modifier.height(20.dp)) }
@@ -225,7 +225,7 @@ fun LocationSection(viewModel : MainViewModel = hiltViewModel()) {
 }
 
 @Composable
-fun SearchBar(moveUp: Boolean, onSearchBarClick: () -> Unit) {
+fun SearchField(moveUp: Boolean, onSearchBarClick: () -> Unit) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
