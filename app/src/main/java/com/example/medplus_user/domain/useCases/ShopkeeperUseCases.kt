@@ -10,3 +10,4 @@ class ShopkeeperUseCases @Inject constructor(
 ){
     operator fun invoke(id: String): Flow<List<Shopkeeper>> = repo.getShopkeepers(medicineId = id)
 }
+

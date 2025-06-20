@@ -1,6 +1,9 @@
 package com.example.medplus_user.presentation
 
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.hilt.navigation.compose.hiltViewModel
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
@@ -16,6 +19,8 @@ import com.example.medplus_user.presentation.viewModel.MainViewModel
 @Composable
 fun Navigation(navController: NavHostController) {
     val viewModel: MainViewModel = hiltViewModel()
+    var selectedIndex = rememberSaveable { mutableStateOf(0) }
+
 
     NavHost(navController = navController, startDestination = HomeScreen) {
         composable<HomeScreen> {

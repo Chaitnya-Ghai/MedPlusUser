@@ -14,15 +14,23 @@ import javax.inject.Inject
 
 class FirebaseService @Inject constructor(){
     val db = Firebase.firestore
-    suspend fun getCategories(): List<CategoryDto>{
+    suspend fun getCategories(): List<CategoryDto> {
         return try {
-            val snapshot = db.collection(category).get().await()
-            snapshot.documents.mapNotNull { it.toObject(CategoryDto::class.java) }
-        }catch (e : Exception){
+            val snapshot = db.collection("category").get().await()
+            snapshot.documents.mapNotNull { doc ->
+                try {
+                    doc.toObject(CategoryDto::class.java)
+                } catch (e: Exception) {
+                    Log.e("FirebaseService", "Deserialization failed: ${doc.data}", e)
+                    null
+                }
+            }
+        } catch (e: Exception) {
             Log.e("FirebaseService", "getCategories error = ${e.message}")
             emptyList()
         }
     }
+
     suspend fun getMedicines(): List<MedicineDto>{
         return try {
             val snapshot = db.collection(medicine).get().await()

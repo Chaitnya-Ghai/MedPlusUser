@@ -8,6 +8,10 @@ import com.example.medplus_user.data.local.entity.CategoryEntity
 @Dao
 interface CategoryDao {
 //
+
+    @Query("DELETE FROM category")
+    suspend fun clearCategories()
+
     @Query("SELECT * FROM category")
     suspend fun showCategories(): List<CategoryEntity>
 
