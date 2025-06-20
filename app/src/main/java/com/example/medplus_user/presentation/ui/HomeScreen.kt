@@ -23,7 +23,6 @@ import androidx.compose.material.icons.filled.AccountCircle
 import androidx.compose.material.icons.filled.Home
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material.icons.filled.ShoppingCart
-import androidx.compose.material.icons.filled.Star
 import androidx.compose.material3.*
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -42,18 +41,24 @@ import androidx.compose.ui.draw.shadow
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavController
+import coil.ImageLoader
 import coil.compose.rememberAsyncImagePainter
+import coil.disk.DiskCache
+import coil.request.CachePolicy
+import coil.request.ImageRequest
 import com.example.medplus_user.domain.models.Category
 import com.example.medplus_user.domain.models.Shopkeeper
 import com.example.medplus_user.presentation.CategoryScreen
 import com.example.medplus_user.presentation.SearchScreen
 import com.example.medplus_user.presentation.viewModel.MainViewModel
 import kotlinx.coroutines.delay
+import java.io.File
 
 @Composable
 fun HomeView(
@@ -73,6 +78,20 @@ fun HomeView(
         label = "BackgroundBlur",
         animationSpec = tween(durationMillis = 700)
     )
+    val context = LocalContext.current
+
+    LaunchedEffect(Unit) {
+        viewModel.categories.value.forEach {
+            ImageLoader(context).enqueue(
+                ImageRequest.Builder(context)
+                    .data(it.imageUrl)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .allowHardware(false)
+                    .build()
+            )
+        }
+    }
 
     if (moveUp) {
         LaunchedEffect(Unit) {
@@ -106,7 +125,7 @@ fun HomeView(
                     text = "Promotions",
                     fontWeight = FontWeight.SemiBold,
                     fontSize = 20.sp,
-                    modifier = Modifier.padding(vertical = 8.dp)
+                    modifier = Modifier.padding(8.dp)
                 )
             }
             item { RandomShops() }
@@ -218,18 +237,6 @@ fun CustomBottomBar(navController: NavController) {
     }
 }
 
-
-// Model
-
-data class Shopkeeper(
-    val name: String,
-    val description: String,
-    val owner: String,
-    val imageUrl: String
-)
-
-// Placeholder Composables
-
 @Composable
 fun HeaderSection() {
     Box(
@@ -325,11 +332,31 @@ fun CategoryCard(
         elevation = CardDefaults.elevatedCardElevation(4.dp),
         colors = CardDefaults.cardColors(containerColor = Color(0xFFF8F4F4))
     ) {
+        val imageLoader = rememberCustomImageLoader()
+        val safeUrl = category.imageUrl.replace(" ", "%20")//Medplus Admin  // space in link cause issue, so replace with %20
         Image(
-            painter = rememberAsyncImagePainter(model = category.imageUrl),
+            painter = rememberAsyncImagePainter(
+                model = ImageRequest.Builder(LocalContext.current)
+                    .data(safeUrl)
+                    .diskCachePolicy(CachePolicy.ENABLED)
+                    .listener(
+                        onError = { request, result ->
+                            Log.e("CoilError", "Image failed: ${category.imageUrl}", result.throwable)
+                        },
+                        onSuccess = { _, _ ->
+                            Log.d("CoilSuccess", "Image loaded: ${category.imageUrl}")
+                        }
+                    )
+                    .memoryCachePolicy(CachePolicy.ENABLED)
+                    .error(R.drawable.error)
+                    .build(),
+                imageLoader = imageLoader // Use custom loader here
+            ),
             contentDescription = category.categoryName,
             contentScale = ContentScale.Crop,
-            modifier = Modifier.fillMaxSize()
+            modifier = Modifier
+                .fillMaxSize()
+                .clip(RoundedCornerShape(12.dp))
         )
     }
 }
@@ -365,7 +392,9 @@ fun CategoryGrid(
                     CategoryCard(
                         category = category,
                         navController = navController,
-                        modifier = Modifier.height(80.dp).width(80.dp)
+                        modifier = Modifier
+                            .height(80.dp)
+                            .width(80.dp)
                             .aspectRatio(1f)
                     )
                 }
@@ -380,7 +409,7 @@ fun CategoryGrid(
             columns = GridCells.Fixed(4),
             modifier = Modifier
                 .fillMaxWidth()
-                .heightIn(max = 500.dp), // Adjust height based on your layout needs
+                .heightIn(max = 600.dp),
             userScrollEnabled = false,
             horizontalArrangement = Arrangement.spacedBy(12.dp),
             verticalArrangement = Arrangement.spacedBy(12.dp)
@@ -393,10 +422,27 @@ fun CategoryGrid(
                         .aspectRatio(1f)
                 )
             }
+            item { Spacer(modifier = Modifier.height(12.dp)) }
         }
     }
 }
 
+@Composable
+fun rememberCustomImageLoader(): ImageLoader {
+    val context = LocalContext.current
+    return remember {
+        ImageLoader.Builder(context)
+            .diskCache {
+                DiskCache.Builder()
+                    .directory(File(context.cacheDir, "image_cache"))
+                    .maxSizeBytes(50L * 1024 * 1024) // 50MB cache
+                    .build()
+            }
+            .crossfade(true)
+            .respectCacheHeaders(false) // <- IMPORTANT
+            .build()
+    }
+}
 
 
 @Composable

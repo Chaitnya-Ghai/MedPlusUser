@@ -14,7 +14,6 @@ import com.example.medplus_user.domain.models.Shopkeeper
 import com.example.medplus_user.domain.repository.UserRepository
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 
 class UserRepositoryImpl @Inject constructor(
@@ -24,30 +23,33 @@ class UserRepositoryImpl @Inject constructor(
     private val medicinesDao: MedicinesDao
 ): UserRepository {
     override fun getCategories(): Flow<List<Category>> = flow {
+        // 1. Emit local data immediately
+        val localEntities = categoryDao.showCategories()
+        val localData = localEntities.map { it.toDomain() }
+        Log.d("UserRepository", "Emitting local data first: $localData")
+        emit(localData)
+
+        // 2. Try to fetch from Firebase if network is available
         if (networkChecker.isNetworkAvailable()) {
             try {
-                val dtoList = firebaseService.getCategories()  // Handles deserialization safely
+                val dtoList = firebaseService.getCategories()
                 Log.d("UserRepository", "Fetched DTOs: $dtoList")
 
-                val categories = dtoList.mapNotNull { it.toDomain() }
+                val categories = dtoList.map { it.toDomain() }
                 Log.d("UserRepository", "Mapped to Domain: $categories")
 
                 val entities = categories.map { it.toEntity() }
                 val validEntities = entities.filter { it.imageUrl.isNotBlank() }
 
-                categoryDao.clearCategories() // 🧹 Clear old stale data
+                categoryDao.clearCategories()
                 categoryDao.insertCategories(validEntities)
 
+                // 3. Emit updated fresh data
                 emit(categories)
             } catch (e: Exception) {
                 Log.e("UserRepository", "Error fetching from Firebase: ${e.message}", e)
-                emit(emptyList())
+                // Optional: emit(localData) again or not, depends on UX choice
             }
-        } else {
-            val localEntities = categoryDao.showCategories()
-            val data = localEntities.map { it.toDomain() }
-            Log.d("UserRepository", "Mapped local data categories: $data")
-            emit(data)
         }
     }
     override suspend fun getMedicinesByCategory(categoryId: String): List<Medicines> {
