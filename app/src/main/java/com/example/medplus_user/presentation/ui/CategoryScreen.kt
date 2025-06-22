@@ -1,188 +1,112 @@
 package com.example.medplus_user.presentation.ui
 
-import android.util.Log
-import androidx.compose.foundation.Image
-import androidx.compose.foundation.clickable
+import android.widget.Toast
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
-import androidx.compose.foundation.layout.fillMaxHeight
+import androidx.compose.foundation.layout.WindowInsets
+import androidx.compose.foundation.layout.asPaddingValues
 import androidx.compose.foundation.layout.fillMaxSize
-import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.statusBars
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
-import androidx.compose.foundation.lazy.grid.items
-import androidx.compose.foundation.shape.RoundedCornerShape
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Search
-import androidx.compose.material3.Card
-import androidx.compose.material3.CardDefaults
-import androidx.compose.material3.Icon
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.OutlinedTextField
-import androidx.compose.material3.OutlinedTextFieldDefaults
-import androidx.compose.material3.Text
+import androidx.compose.foundation.lazy.grid.itemsIndexed
+import androidx.compose.foundation.lazy.grid.rememberLazyGridState
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
-import androidx.compose.runtime.MutableState
 import androidx.compose.runtime.collectAsState
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
-import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
+import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.layout.ContentScale
-import androidx.compose.ui.text.TextStyle
-import androidx.compose.ui.text.font.FontFamily
-import androidx.compose.ui.text.font.FontWeight
-import androidx.compose.ui.text.style.TextAlign
-import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.sp
-import androidx.navigation.NavController
+import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
-import coil.compose.rememberAsyncImagePainter
-import com.example.medplus_user.domain.models.Medicines
-import com.example.medplus_user.presentation.ShopkeeperResultScreen
+import com.example.medplus_user.common.Resource
+import com.example.medplus_user.presentation.ui.cardViews.MedicineCard
 import com.example.medplus_user.presentation.viewModel.MainViewModel
 
 @Composable
 fun CategoryView(
-    medId: String?, name: String,
+    catId: String?,
+    categoryName: String,
     navController: NavHostController,
     viewModel: MainViewModel
 ) {
-
-    val query = remember { mutableStateOf("") }
+    val context = LocalContext.current
+    val searchQuery by viewModel.categorySpecificMedicinesQuery.collectAsState()
+    val categoryMedicinesResource by viewModel.categorySpecificMedicines.collectAsState()
+    val filteredMedicines by viewModel.filteredCategoryMedicines.collectAsState()
 
     LaunchedEffect(Unit) {
-        Log.e("CategoryScreen", "CategoryView: $medId " )
-        viewModel.getMedicinesByCategory(catId = medId.toString())
+        viewModel.getMedicinesByCategory(catId ?: "")
     }
 
-    val medicineList by viewModel.medicinesByCat.collectAsState()
-
-    Column (horizontalAlignment = Alignment.CenterHorizontally){
-        Spacer(modifier = Modifier.padding(top = 26.dp))
-        Text(text = name, modifier = Modifier.padding(12.dp), fontSize = 24.sp)
-        Spacer(modifier = Modifier.padding(12.dp))
-        SearchField(query)
-        LazyVerticalGrid(
-            columns = GridCells.Fixed(2),
-            modifier = Modifier
-                .fillMaxHeight(1f) // this bounds the height
-                .padding(5.dp),
-            userScrollEnabled = true
-        ) {
-            if (query.value.isBlank()) {
-                items(medicineList) { medicine ->
-                    MedicineCard(medicine , navController = navController)
-                }
-            }
-            else{
-                items(medicineList.filter { it.medicineName.toString().contains(query.value) }) { medicine ->
-                    MedicineCard(medicine , navController )
-                }
-            }
-
-        }
-    }
-}
-
-
-@Composable
-fun MedicineCard(item: Medicines , navController: NavController) = Card(
-    modifier = Modifier
-        .fillMaxSize()
-        .aspectRatio(1f)
-        .clickable {
-            Log.e("Ui Event", "${item.medicineName} clicked")
-            navController.navigate(ShopkeeperResultScreen(item.id.toString()))//this screen contains medicines from local shopkeepers
-        },
-    shape = RoundedCornerShape(8.dp),
-    elevation = CardDefaults.elevatedCardElevation(8.dp)
-) {
-    Column {
-        Image(
-            painter = rememberAsyncImagePainter(model = item.medicineImg),
-            contentDescription = "Image of ${item.medicineName}",
-            modifier = Modifier.fillMaxSize(),
-            contentScale = ContentScale.Crop
-        )
-        Text(
-            text = item.medicineName.toString(),
-            modifier = Modifier
-                .padding(8.dp)
-                .fillMaxWidth(),
-            style = TextStyle(
-                fontFamily = FontFamily.Monospace,
-                fontWeight = FontWeight.Bold,
-                fontSize = 12.sp,
-                textAlign = TextAlign.Center
-            )
-        )
-    }
-}
-
-@Composable
-fun SearchField(query: MutableState<String>) {
-    OutlinedTextField(
-        value = query.value,
-        onValueChange = { query.value = it },
-        placeholder = { Text("Search...") },
-        leadingIcon = {
-            Icon(
-                imageVector = Icons.Default.Search,
-                contentDescription = "Search icon"
-            )
-        },
-        trailingIcon = {
-            if (query.value.isNotEmpty()) {
-                Icon(
-                    imageVector = Icons.Default.Close,
-                    contentDescription = "Clear icon",
-                    modifier = Modifier
-                        .clickable { query.value = "" }
-                        .padding(end = 8.dp)
-                )
-            }
-        },
+    Column(
         modifier = Modifier
-            .fillMaxWidth(0.95f)
-            .height(70.dp)
-            .padding(8.dp),
-        shape = RoundedCornerShape(12.dp),
-        singleLine = true,
-        textStyle = TextStyle(fontSize = 16.sp),
-        colors = OutlinedTextFieldDefaults.colors(
-            focusedBorderColor = MaterialTheme.colorScheme.primary,
-            unfocusedBorderColor = Color.LightGray
+            .padding(top = WindowInsets.statusBars.asPaddingValues().calculateTopPadding())
+            .fillMaxSize()
+            .background(
+                brush = Brush.verticalGradient(
+                    listOf( Color(0xFFE4D0FF) , Color(0xFFFFE5EC) )
+                )
+            )
+        ,
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        SearchHeader(title = categoryName) {
+            navController.popBackStack()
+        }
+
+        SearchBar(
+            query = searchQuery,
+            onQueryChange = { viewModel.updateCategorySpecificMedicinesQuery(it) },
+            onFilterClick = {}
         )
-    )
-}
-
-@Preview(showBackground = true)
-@Composable
-fun SearchBarPreview() {
-    val query = remember { mutableStateOf("Paracetamol") }
-
-    // Optional: Wrap in a MaterialTheme and Column to preview nicely
-    MaterialTheme {
-        Column(
-            modifier = Modifier
-                .fillMaxSize()
-                .padding(16.dp),
-            horizontalAlignment = Alignment.CenterHorizontally,
-            verticalArrangement = Arrangement.Center
-        ) {
-            SearchField(query = query)
+val gridState = rememberLazyGridState()
+        when (categoryMedicinesResource) {
+            is Resource.Loading -> {
+                Box(
+                    modifier = Modifier.fillMaxSize(),
+                    contentAlignment = Alignment.Center
+                ) {
+                    CircularProgressIndicator()
+                }
+            }
+            is Resource.Error -> {
+                Toast.makeText(context, categoryMedicinesResource.message ?: "Error", Toast.LENGTH_SHORT).show()
+            }
+            is Resource.Success -> {
+                LazyVerticalGrid(
+                    state = gridState,
+                    columns = GridCells.Fixed(2),
+                    verticalArrangement = Arrangement.spacedBy(8.dp),
+                    horizontalArrangement = Arrangement.spacedBy(8.dp),
+                    contentPadding = PaddingValues(8.dp),
+                    modifier = Modifier.fillMaxSize()
+                ) {
+                    itemsIndexed( filteredMedicines ,
+                        span = { index, _ ->
+                            if ((index + 1) % 5 == 0) GridItemSpan(2) else GridItemSpan(1)
+                        }) { index, item ->
+                        val isFullSpan = (index + 1) % 5 == 0
+                        MedicineCard(med = item, isFullSpan = isFullSpan)
+                    }
+                    item { Spacer(modifier = Modifier.height(180.dp)) }
+                }
+            }
         }
     }
 }
+
+
 
 

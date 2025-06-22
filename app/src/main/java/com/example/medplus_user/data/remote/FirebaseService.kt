@@ -1,7 +1,6 @@
 package com.example.medplus_user.data.remote
 
 import android.util.Log
-import com.example.medplus_user.common.Constants.Companion.category
 import com.example.medplus_user.common.Constants.Companion.medicine
 import com.example.medplus_user.common.Constants.Companion.pharmacist
 import com.example.medplus_user.data.remote.dto.CategoryDto
@@ -70,7 +69,7 @@ class FirebaseService @Inject constructor(){
     }
 
 
-    suspend fun getPharmacist(medicineId: String): List<ShopkeeperDto>{
+    suspend fun getShopkeeperFromMedicineId(medicineId: String): List<ShopkeeperDto>{
         return try {
             val snapshot = db.collection(pharmacist).whereArrayContains("medicineId",medicineId)
                 .get().await()
@@ -81,9 +80,14 @@ class FirebaseService @Inject constructor(){
         }
     }
 
+    suspend fun getAllShopkeepers(): List<ShopkeeperDto>{
+            val db= db.collection(pharmacist).get().await()
+            return db.documents.mapNotNull { it.toObject(ShopkeeperDto::class.java) }
+    }
+
     suspend fun getNearbyShopkeepers(rangeInMeters: Double,userLat: Double, userLon: Double): List<Pair<ShopkeeperDto, Float>> {
         return try {
-            val snapshot = db.collection("shopkeepers").get().await()
+            val snapshot = db.collection(pharmacist).get().await()
             snapshot.documents.mapNotNull { doc ->
                 val shop = doc.toObject(ShopkeeperDto::class.java)
                 shop?.let {

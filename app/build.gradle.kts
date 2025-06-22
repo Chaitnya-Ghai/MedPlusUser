@@ -86,6 +86,9 @@ dependencies {
     implementation("io.coil-kt:coil-compose:2.5.0")
 //    gson
     implementation(libs.gson)
+//    shimmer
+    implementation("com.google.accompanist:accompanist-placeholder-material:0.34.0")
+
 // location
     implementation(libs.play.services.location)
     implementation(libs.play.services.maps)//map dependency

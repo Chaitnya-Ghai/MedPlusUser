@@ -5,8 +5,12 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object HomeScreen
 
+
 @Serializable
-data object SearchScreen
+data object SearchMedicinesScreen
+
+@Serializable
+data object SearchShopkeepersScreen
 
 @Serializable
 data class CategoryScreen(
@@ -14,7 +18,7 @@ data class CategoryScreen(
     val name : String
 )
 @Serializable
-data class ShopkeeperResultScreen(
+data class ShopkeeperShopScreen(
     val id : String
 )
 

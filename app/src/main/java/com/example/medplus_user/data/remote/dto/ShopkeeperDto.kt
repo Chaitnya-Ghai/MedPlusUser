@@ -1,5 +1,7 @@
 package com.example.medplus_user.data.remote.dto
 
+import com.google.firebase.firestore.PropertyName
+
 data class ShopkeeperDto(
     val authId: String = "",
     val shopName: String = "",
@@ -9,8 +11,10 @@ data class ShopkeeperDto(
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
     val inventory: List<InventoryDto> = emptyList(),
-    val medicineId: List<String> = emptyList(),//for faster query
+    val medicineId: List<String> = emptyList(),
     val licenseImageUrl: String = "",
     val shopImageUrl: String = "",
-    var isVerified: Int ?=0,  // 0 for not Register , 1 for not verified, 2 for verified , 3 for rejected
+    @get:PropertyName("verified")
+    @set:PropertyName("verified")
+    var isVerified: Int? = 0 // maps "verified" from Firestore
 )

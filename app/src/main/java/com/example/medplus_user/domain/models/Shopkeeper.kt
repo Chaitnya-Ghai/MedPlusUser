@@ -1,7 +1,5 @@
 package com.example.medplus_user.domain.models
 
-import kotlinx.serialization.Contextual
-
 data class Shopkeeper(
     val id: String = "",
     val shopName: String = "",
@@ -11,11 +9,12 @@ data class Shopkeeper(
     val latitude: Double = 0.0,
     val longitude: Double = 0.0,
     val inventory: List<Inventory> = emptyList(),
-    val medicineId: List<String> = emptyList(),//for faster query
+    val medicineId: List<String> = emptyList(),
     val licenseImageUrl: String = "",
     val shopImageUrl: String = "",
-    var isVerified: Int ?=0,
+    val isVerified: Int? = 0
 )
+
 data class Inventory(
     var medicineId: String = "",
     var medicineName: String = "",
