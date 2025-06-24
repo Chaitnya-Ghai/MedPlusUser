@@ -88,6 +88,8 @@ dependencies {
     implementation(libs.gson)
 //    shimmer
     implementation("com.google.accompanist:accompanist-placeholder-material:0.34.0")
+//
+    implementation("com.google.accompanist:accompanist-permissions:0.37.3")
 
 // location
     implementation(libs.play.services.location)

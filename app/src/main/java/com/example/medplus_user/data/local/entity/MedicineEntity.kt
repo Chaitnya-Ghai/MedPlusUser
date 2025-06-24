@@ -2,10 +2,10 @@ package com.example.medplus_user.data.local.entity
 
 import androidx.room.Entity
 import androidx.room.PrimaryKey
-import com.example.medplus_user.common.Constants.Companion.medicine
+import com.example.medplus_user.common.Constants.Companion.MEDICINE
 import com.example.medplus_user.data.remote.dto.ProductDetailDto
 
-@Entity(tableName = medicine)
+@Entity(tableName = MEDICINE)
 data class MedicineEntity(
     @PrimaryKey var id :String,
     var medicineName :String?=null,

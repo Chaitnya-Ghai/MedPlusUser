@@ -33,7 +33,7 @@ import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.medplus_user.presentation.ui.cardViews.ShopkeeperCard
+import com.example.medplus_user.presentation.common.cardViews.ShopkeeperCard
 import com.example.medplus_user.presentation.viewModel.MainViewModel
 
 @Composable

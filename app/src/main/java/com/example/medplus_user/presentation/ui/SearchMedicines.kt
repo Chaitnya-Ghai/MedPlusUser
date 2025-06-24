@@ -38,7 +38,7 @@ import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavController
 import com.example.medplus_user.R
-import com.example.medplus_user.presentation.ui.cardViews.MedicineCard
+import com.example.medplus_user.presentation.common.cardViews.MedicineCard
 import com.example.medplus_user.presentation.viewModel.MainViewModel
 
 @Composable
@@ -66,7 +66,7 @@ fun SearchMedicinesScreen(navController: NavController , viewModel: MainViewMode
             horizontalAlignment = Alignment.CenterHorizontally
         ) {
             SearchHeader(
-                title = "Search Shopkeepers",
+                title = "Search Medicines",
                 onBack = { navController.popBackStack() }
             )
 

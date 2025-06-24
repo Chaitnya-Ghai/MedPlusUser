@@ -1,8 +1,8 @@
 package com.example.medplus_user.data.remote
 
 import android.util.Log
-import com.example.medplus_user.common.Constants.Companion.medicine
-import com.example.medplus_user.common.Constants.Companion.pharmacist
+import com.example.medplus_user.common.Constants.Companion.MEDICINE
+import com.example.medplus_user.common.Constants.Companion.PHARMACIST
 import com.example.medplus_user.data.remote.dto.CategoryDto
 import com.example.medplus_user.data.remote.dto.MedicineDto
 import com.example.medplus_user.data.remote.dto.ShopkeeperDto
@@ -32,7 +32,7 @@ class FirebaseService @Inject constructor(){
 
     suspend fun getMedicines(): List<MedicineDto>{
         return try {
-            val snapshot = db.collection(medicine).get().await()
+            val snapshot = db.collection(MEDICINE).get().await()
             snapshot.documents.mapNotNull { document -> document.toObject(MedicineDto::class.java) }
         }catch (e: Exception){
             Log.e("FirebaseService", "getMedicines error = ${e.message}")
@@ -71,7 +71,7 @@ class FirebaseService @Inject constructor(){
 
     suspend fun getShopkeeperFromMedicineId(medicineId: String): List<ShopkeeperDto>{
         return try {
-            val snapshot = db.collection(pharmacist).whereArrayContains("medicineId",medicineId)
+            val snapshot = db.collection(PHARMACIST).whereArrayContains("medicineId",medicineId)
                 .get().await()
             snapshot.documents.mapNotNull { it.toObject(ShopkeeperDto::class.java) }
         }catch (e: Exception){
@@ -81,24 +81,8 @@ class FirebaseService @Inject constructor(){
     }
 
     suspend fun getAllShopkeepers(): List<ShopkeeperDto>{
-            val db= db.collection(pharmacist).get().await()
+            val db= db.collection(PHARMACIST).get().await()
             return db.documents.mapNotNull { it.toObject(ShopkeeperDto::class.java) }
     }
 
-    suspend fun getNearbyShopkeepers(rangeInMeters: Double,userLat: Double, userLon: Double): List<Pair<ShopkeeperDto, Float>> {
-        return try {
-            val snapshot = db.collection(pharmacist).get().await()
-            snapshot.documents.mapNotNull { doc ->
-                val shop = doc.toObject(ShopkeeperDto::class.java)
-                shop?.let {
-//                    val distanceInMeters = calculateDistanceInMeters(userLat, userLon, it.latitude, it.longitude)
-//                    if (distanceInMeters <= rangeInMeters) Pair(it, distanceInMeters) else null
-                    null
-                }
-            }
-        } catch (e: Exception) {
-            Log.e("Firebase", "Error fetching shopkeepers: ${e.message}")
-            emptyList()
-        }
-    }
 }

@@ -10,7 +10,7 @@ import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
 import com.example.medplus_user.presentation.ui.CategoryView
-import com.example.medplus_user.presentation.ui.CustomBottomBar
+import com.example.medplus_user.presentation.common.CustomBottomBar
 import com.example.medplus_user.presentation.ui.HomeView
 import com.example.medplus_user.presentation.ui.SearchMedicinesScreen
 import com.example.medplus_user.presentation.ui.SearchShopkeepersScreen

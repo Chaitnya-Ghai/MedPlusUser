@@ -1,4 +1,4 @@
-package com.example.medplus_user.presentation.ui
+package com.example.medplus_user.presentation.common
 
 import androidx.compose.foundation.background
 import androidx.compose.material.icons.Icons

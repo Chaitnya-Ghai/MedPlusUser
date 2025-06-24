@@ -1,4 +1,4 @@
-package com.example.medplus_user.presentation.ui.cardViews
+package com.example.medplus_user.presentation.common.cardViews
 
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.layout.Box

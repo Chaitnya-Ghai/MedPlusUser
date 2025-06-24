@@ -31,7 +31,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.navigation.NavHostController
 import com.example.medplus_user.common.Resource
-import com.example.medplus_user.presentation.ui.cardViews.MedicineCard
+import com.example.medplus_user.presentation.common.cardViews.MedicineCard
 import com.example.medplus_user.presentation.viewModel.MainViewModel
 
 @Composable
